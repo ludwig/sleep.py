@@ -18,6 +18,11 @@ This means that we need a way to have our script authenticate via OAuth
 so that we can automatically create all the necessary entries under our account.
 This page contains instructions for how to set up all that nonsense.
 
+As far as inputs are concerned, we are able to process dates in a natural
+way thanks to the `dateparser` Python library. Check it out:
+* [dateparser - python parser for human readable dates](https://dateparser.readthedocs.io/en/latest/)
+* <https://github.com/scrapinghub/dateparser>
+
 ## Quickstart
 
 ![Awake](./images/awake.png)
@@ -40,7 +45,8 @@ This might be the case if you didn't sleep exactly 8 hours.
 
 You can specify intervals via the usual start, end, duration values.
 The script itself will check for consistency, and fill in reasonable
-defaults for the missing information.
+defaults for the missing information. The end value defaults to 'now',
+and the duration value defaults to 8 hours.
 
 The `-u` flag can be omitted if you want to double check
 the sleep intervals that will be created. When you're ready to update
@@ -75,20 +81,17 @@ want to see when you'll be falling asleep next if you stay up for 21.5 hours.
 
 Now let's suppose you fell asleep yesterday at 1pm and didn't wake up until
 11pm and now you want to know when you'd be waking up if you stay up for
-27 hours and sleep for 6.5 hours. Note that the `-p` flag is implied
-by overriding any of the `--next-*` options.
+27 hours and sleep for 6.5 hours.
 
 ```
 ./sleep.py -s '1pm yesterday' -e '11pm yesterday' -o 27 --nd 6.5
 ```
 
+Note that the `-p` flag is implied by overriding any of the `--next-*` options.
+
 ## CLI Options
 
 ![Options](./images/options.png)
-
-Thanks to the `dateparser` Python library, we are able to process input dates
-in a natural way. Check it out:
-* [dateparser - python parser for human readable dates](https://dateparser.readthedocs.io/en/latest/)
 
 Here is a guide to the options you will see after running:
 ```bash
