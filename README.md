@@ -15,9 +15,9 @@ Google Calendar UI to remember all those sleep events in a way that
 can be visualized easily.
 
 This means that we need a way to have our script authenticate via OAuth
-so that we can automatically create all the necessary entries under our account.
-This page contains [instructions](#gcal-integration) for how to set up
-all that nonsense.
+so that we can automatically create all the necessary entries under our
+Google account. This page contains [instructions](#gcal-integration)
+for how to set up all that nonsense.
 
 As far as inputs are concerned, we are able to process dates in a natural
 way thanks to the `dateparser` Python library. It supports relative
@@ -77,12 +77,14 @@ the Google Calendar you can put it back.
 We only "predict" the next sleep interval in the sense that we make it easy
 to add the next entry to our "Sleep" calendar.
 
-You can include the next sleep interval by simply adding the `-p` flag
-to our command invocation.
+To compute the next sleep event you can simply add the `-p` flag
+to the command invocation.
 
-You can manipulate the offset value with the `-o` option by providing
-the number of hours you plan to stay awake. The default is 16, but if you
-know you'll be up for 20 hours, you can override it easily.
+You can also change the offset value with the `-o` option by providing
+the number of hours you plan to stay awake. This will change the start of
+the next sleep event relative to the end of the current sleep event.
+The default offset is 16, but if you know you'll be up for 20 hours,
+you can override it easily by providing a value.
 
 ```
 ./sleep.py -p -o 20
@@ -128,7 +130,7 @@ Options related to the next sleep interval:
 * `--next-duration, --nd`: Duration of next sleep event (e.g. "8 hours")
 
 This offset represents how long you plan to stay awake for.
-* `--default-offset, -o`: Default offset to next sleep event (e.g. "16 hours")
+* `--offset, -o`: Default offset to next sleep event (e.g. "16 hours")
 
 Options related to Google Calendar:
 * `--update-calendar, -u`: Update calendar with specified sleep events.
