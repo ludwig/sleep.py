@@ -10,18 +10,30 @@ You just woke up. Questions arise.
 
 Let's make it easy to answer those questions with a sleep.py helper script.
 
-We can make it easy on ourselves by relying on the excellent
+We can make it very simple on ourselves by relying on the excellent
 Google Calendar UI to remember all those sleep events in a way that
 can be visualized easily.
 
 This means that we need a way to have our script authenticate via OAuth
 so that we can automatically create all the necessary entries under our account.
-This page contains [instructions](#gcal-integration) for how to set up all that nonsense.
+This page contains [instructions](#gcal-integration) for how to set up
+all that nonsense.
 
 As far as inputs are concerned, we are able to process dates in a natural
-way thanks to the `dateparser` Python library. Check it out:
+way thanks to the `dateparser` Python library. It supports relative
+dates like "yesterday", "tomorrow", "now" in various combinations with times
+in am/pm format. Check it out:
 * [dateparser - python parser for human readable dates](https://dateparser.readthedocs.io/en/latest/)
 * <https://github.com/scrapinghub/dateparser>
+
+The durations are parsed using the `parsedatetime` Python library.
+That one can support versatile inputs like "8 hours", "6 hours 30 mins",
+"5h 15m", "4.5h", etc. The supported formats aren't obvious from the
+documentation, but we've adapted the use of the calendar `parseDT` function
+within our own `parse_duration` method. Simply try out various formats
+to see if they work!
+* <https://pypi.org/project/parsedatetime/>
+* <https://github.com/bear/parsedatetime>
 
 ## Quickstart
 
@@ -47,6 +59,12 @@ You can specify intervals via the usual start, end, duration values.
 The script itself will check for consistency, and fill in reasonable
 defaults for the missing information. The end value defaults to 'now',
 and the duration value defaults to 8 hours.
+
+For example, if you woke up at 1am, and fell asleep around 7:30pm yesterday,
+you would use this to add an entry to your "Sleep" calendar:
+```bash
+./sleep.py -e '1am' -s '7:30pm yesterday' -u
+```
 
 The `-u` flag can be omitted if you want to double check
 the sleep intervals that will be created. When you're ready to update

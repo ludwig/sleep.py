@@ -54,6 +54,7 @@ import pytz
 from datetime import datetime, timedelta
 
 import dateparser
+import parsedatetime as pdt
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
@@ -260,12 +261,27 @@ def parse_time(input_time):
 
 
 def parse_duration(input_duration):
-    # Parsse the duration string into a timedelta object.
-    # This function needs to handle various formats, such as
-    # "8 hours", "8 hours and 30 minutes", "8h30m", etc.
-    # For simplicity, let's assume the input_duration string is in hours.
-    duration_hours = float(input_duration)
-    return timedelta(hours=duration_hours)
+    """Parse the duration string into a timedelta object.
+    
+    This function can handle various formats, such as
+    "8 hours", "8 hours 30 minutes", "8h 30m", etc.
+    """
+    # First check whether the input_duration is a number.
+    try:
+        hours = float(input_duration)
+        return timedelta(hours=hours)
+    except ValueError:
+        pass
+    # If that failed, use parsedatetime to parse the duration string.
+    cal = pdt.Calendar()
+    now = datetime.now()
+    time_struct, parse_status = cal.parseDT(
+        datetimeString=input_duration,
+        sourceTime=now,
+    )
+    if not parse_status:
+        raise ValueError(f"Unable to parse duration: {red(input_duration)}")
+    return time_struct - now
 
 
 def get_checked_duration(start, end, check_duration, threshold_mins=5):
