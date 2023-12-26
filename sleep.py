@@ -89,17 +89,17 @@ RESET = "\033[0m"
 
 def red(text):
     """Return the given text in red."""
-    return f"{RED}{text}{RESET}"
+    return f"{BOLD}{RED}{text}{RESET}"
 
 
 def green(text):
     """Return the given text in green."""
-    return f"{GREEN}{text}{RESET}"
+    return f"{BOLD}{GREEN}{text}{RESET}"
 
 
 def blue(text):
     """Return the given text in blue."""
-    return f"{BLUE}{text}{RESET}"
+    return f"{BOLD}{BLUE}{text}{RESET}"
 
 
 def bold(text):
@@ -175,12 +175,14 @@ def get_sleep_calendar_id(service, verbose=False):
         if calendar["summary"] == sleep_calendar:
             if verbose:
                 print(f"Calendar '{blue(sleep_calendar)}' already exists.")
+                print(f"{BOLD}Calendar ID: {blue(calendar['id'])}")
             return calendar["id"]
     
     # If "Sleep" calendar doesn't exist, create it.
     created_calendar = service.calendars().insert(body=SLEEP_CALENDAR).execute()
     if verbose:
         print(f"Created calendar '{blue(sleep_calendar)}'")
+        print(f"{BOLD}Calendar ID: {blue(created_calendar['id'])}")
 
     return created_calendar["id"]
 
@@ -205,7 +207,10 @@ def create_calendar_event(service, calendar_id, summary, start_time, end_time, t
 
 
 def create_sleep_event_now(service, calendar_id, duration=8):
-    # TODO: This function was the initial test.
+    # NOTE: This function was the original implementation
+    # that checked we had the appropriate access to the
+    # "Sleep" calendar in our Google account.
+
     timezone = SLEEP_CALENDAR["timeZone"]
 
     now = datetime.now(TIMEZONE)
@@ -213,10 +218,9 @@ def create_sleep_event_now(service, calendar_id, duration=8):
     end_time = now + timedelta(hours=duration)
 
     calendar_id = get_sleep_calendar_id(service, verbose=True)
-    print(f"Sleep calendar ID: {calendar_id}")
 
     summary = f"Sleep: {duration:.1f} hours"
-    create_sleep_event(service, calendar_id, summary, start_time, end_time, timezone)
+    create_calendar_event(service, calendar_id, summary, start_time, end_time, timezone)
 
 
 def create_sleep_event(service, calendar_id, sleep_interval, event_prefix="Sleep"):
@@ -228,7 +232,7 @@ def create_sleep_event(service, calendar_id, sleep_interval, event_prefix="Sleep
 
     event = create_calendar_event(
         service, calendar_id, summary, start_time, end_time, timezone)
-    print(event)
+    #print(event)
 
     return event
 
