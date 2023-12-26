@@ -193,9 +193,11 @@ correctly with this script.
 2. Next to the OAuth client, click on the download icon to download the JSON file.
 3. The JSON file contains your client ID and client secret. Keep it secure and do not share it.
 
-In our case, we will create the following directory and copy.
-You can change it by editing the `SECURITY_DIR` configuration variable
-at the top of the `sleep.py` script.
+In our case, we will create the following directory to store our
+`client_secret.json` credentials.  You can change it by editing the
+`SECURITY_DIR` configuration variable at the top of the script.
+You can also export the `SECURITY_DIR` environment variable before calling
+the script itself.
 
 ```bash
 export SECURITY_DIR="${HOME}/security/gcp/sleep.py"

@@ -59,16 +59,18 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 
+# Directory containing credentials for our script.
+DEFAULT_SECURITY_DIR = "~/security/gcp/sleep.py/"
+DEFAULT_SECURITY_DIR = os.path.normpath(os.path.expanduser(DEFAULT_SECURITY_DIR))
+SECURITY_DIR = os.environ.get('SECURITY_DIR', DEFAULT_SECURITY_DIR)
 
-SECURITY_DIR = os.environ.get(
-    'SECURITY_DIR',
-    os.path.normpath(os.path.expanduser("~/security/gcp/sleep.py/"))
-)
-
+# The credentials file for our script.
 CLIENT_SECRET_JSON = "client_secret.json"
 CLIENT_SECRET = os.path.join(SECURITY_DIR, CLIENT_SECRET_JSON)
-assert os.path.exists(CLIENT_SECRET), f"File not found: {CLIENT_SECRET}"
 
+# The temporary file caching our user's access and refresh tokens.
+# We use this strategy to avoid having to re-authenticate through the
+# web browser every single time we run the script.
 TOKEN_PICKLE = os.path.join(SECURITY_DIR, "token.pickle")
 
 # Calendar details for your "Sleep" calendar.
@@ -111,6 +113,12 @@ def bold(text):
 def get_service():
     """Get a Google Calendar API service object."""
     creds = None
+
+    # Basic checks to ensure we have the necessary files and directories.
+    if not os.path.exists(SECURITY_DIR):
+        raise ValueError(f"Security directory not found: {SECURITY_DIR}")
+    if not os.path.exists(CLIENT_SECRET):
+        raise ValueError(f"Credentials file not found: {CLIENT_SECRET}")
 
     # The "token.pickle" file stores the user's access and refresh tokens.
     # We create this file automatically when the authorization flow completes
