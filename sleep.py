@@ -22,7 +22,10 @@ Options related to the next sleep interval:
   --next-duration, --nd: Duration of next sleep event (e.g. "8 hours")
 
 This offset represents how long you plan to stay awake for:
-  --default-offset, -o: Default offset to next sleep event (e.g. "16 hours")
+  --offset, -o: Default offset to the next sleep event (e.g. "16 hours")
+
+Options related to Google Calendar:
+  --update-calendar, -u: Update calendar with specified sleep events.
 
 ----------------
 
@@ -196,9 +199,9 @@ def get_sleep_calendar_id(service, verbose=False):
     return created_calendar["id"]
 
 
-def create_calendar_event(service, calendar_id, summary, start_time, end_time, timezone, verbose=False):
+def create_calendar_event(service, calendar_id, title, start_time, end_time, timezone, verbose=False):
     event = {
-        "summary": summary,
+        "summary": title,
         "start": {
             "dateTime": start_time.isoformat(),
             "timeZone": timezone,
@@ -228,19 +231,19 @@ def create_sleep_event_now(service, calendar_id, duration=8):
 
     calendar_id = get_sleep_calendar_id(service, verbose=True)
 
-    summary = f"Sleep: {duration:.1f} hours"
-    create_calendar_event(service, calendar_id, summary, start_time, end_time, timezone)
+    title = f"Sleep: {duration:.1f} hours"
+    create_calendar_event(service, calendar_id, title, start_time, end_time, timezone)
 
 
-def create_sleep_event(service, calendar_id, sleep_interval, event_prefix="Sleep"):
+def create_sleep_event(service, calendar_id, sleep_interval, title_prefix="Sleep"):
     timezone = SLEEP_CALENDAR["timeZone"]
 
     start_time, end_time, duration = sleep_interval
     duration_hours = duration.total_seconds() / 3600
-    summary = f"{event_prefix}: {duration_hours:.1f} hours"
+    title = f"{title_prefix}: {duration_hours:.1f} hours"
 
     event = create_calendar_event(
-        service, calendar_id, summary, start_time, end_time, timezone)
+        service, calendar_id, title, start_time, end_time, timezone)
     #print(event)
 
     return event
@@ -248,7 +251,9 @@ def create_sleep_event(service, calendar_id, sleep_interval, event_prefix="Sleep
 
 def create_current_sleep_event(service, calendar_id, current_interval):
     current_sleep_event = create_sleep_event(
-        service, calendar_id, current_interval, event_prefix="Sleep")
+        service, calendar_id, current_interval,
+        title_prefix="Sleep",
+    )
     url = current_sleep_event.get("htmlLink")
     print(f"{BOLD}Current sleep event:   {green(url)}")
     return current_sleep_event
@@ -258,7 +263,9 @@ def create_next_sleep_event(service, calendar_id, next_interval):
     if not next_interval:
         return None
     next_sleep_event = create_sleep_event(
-        service, calendar_id, next_interval, event_prefix="Predicted Sleep")
+        service, calendar_id, next_interval,
+        title_prefix="Predicted Sleep",
+    )
     url = next_sleep_event.get("htmlLink")
     print(f"{BOLD}Predicted sleep event: {green(url)}")
     return next_sleep_event
@@ -271,8 +278,8 @@ def parse_time(input_time):
 def parse_duration(input_duration):
     """Parse the duration string into a timedelta object.
     
-    This function can handle various formats, such as
-    "8 hours", "8 hours 30 minutes", "8h 30m", etc.
+    This function can handle a versatile number of formats, such as
+    "8 hours", "6 hours 30 minutes", "5h 15m", "4.5h", etc.
     """
     # First check whether the input_duration is a number.
     try:
@@ -314,9 +321,13 @@ def get_interval(input_start, input_end, input_duration, default_end='now', defa
     """Get time interval based on start, end, and duration.
     
     Missing values are calculated based on the other two values.
-    Applicable defaults are also introduced in some cases."""
+    Applicable defaults are also introduced in some cases.
+    """
 
-    # Logic to calculate missing value or perform consistency checks.
+    # In this function, we provide the logic for calculating any
+    # missing values by applying sensible defaults. If all three
+    # values are given, we perform basic consistency checks.
+
     start = parse_time(input_start) if input_start else None
     end = parse_time(input_end) if input_end else None
     duration = parse_duration(input_duration) if input_duration else None
@@ -371,7 +382,8 @@ def get_interval(input_start, input_end, input_duration, default_end='now', defa
 
 
 def print_interval(start, end, duration):
-    # Can also use '%z' to display offset from UTC.
+    """Print the given event interval in a human-readable format."""
+    # Can also use '%z' to display timezone information as UTC offset.
     start_str = start.strftime("%Y-%m-%d %H:%M %Z")
     end_str = end.strftime("%Y-%m-%d %H:%M %Z")
     duration_hours = duration.total_seconds() / 3600
@@ -403,9 +415,9 @@ def get_next_interval(args, current_interval, verbose=False):
     next_start = args.next_start
     next_end = args.next_end
     next_duration = args.next_duration
-    offset = parse_duration(args.default_offset)
+    offset = parse_duration(args.offset)
 
-    if not any([next_start, next_end, next_duration]):
+    if not (next_start or next_end):
         # Prediction was requested, but no interval information was provided.
         # Let's assume we the start of our next sleep interval will begin
         # after a constant offset (default 16 hours) from the end of the
@@ -447,8 +459,8 @@ def create_parser():
         help='Duration of next sleep event (e.g. "8 hours")')
 
     parser.add_argument(
-        "--default-offset", "-o", default="16",
-        help='Default offset to next sleep event (e.g. "16 hours")')
+        "--offset", "-o", default="16",
+        help='Default offset to the next sleep event (e.g. "16 hours")')
     
     parser.add_argument(
         "--update-calendar", "-u", action='store_true',
@@ -470,7 +482,7 @@ def main():
     if not args.update_calendar:
         return
 
-    # Update the calendar with the sleep events.
+    # Update calendar with the given sleep events.
     service = get_service()
     calendar_id = get_sleep_calendar_id(service, verbose=True)
     create_current_sleep_event(service, calendar_id, current_interval)
