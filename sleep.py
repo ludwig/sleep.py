@@ -59,9 +59,15 @@ from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 
 
-SECURITY_DIR = os.path.normpath(os.path.expanduser("~/security/gcp/sleep.py/"))
+SECURITY_DIR = os.environ.get(
+    'SECURITY_DIR',
+    os.path.normpath(os.path.expanduser("~/security/gcp/sleep.py/"))
+)
+
 CLIENT_SECRET_JSON = "client_secret.json"
 CLIENT_SECRET = os.path.join(SECURITY_DIR, CLIENT_SECRET_JSON)
+assert os.path.exists(CLIENT_SECRET), f"File not found: {CLIENT_SECRET}"
+
 TOKEN_PICKLE = os.path.join(SECURITY_DIR, "token.pickle")
 
 # Calendar details for your "Sleep" calendar.

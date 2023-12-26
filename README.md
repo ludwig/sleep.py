@@ -16,7 +16,7 @@ can be visualized easily.
 
 This means that we need a way to have our script authenticate via OAuth
 so that we can automatically create all the necessary entries under our account.
-This page contains instructions for how to set up all that nonsense.
+This page contains [instructions](#gcal-integration) for how to set up all that nonsense.
 
 As far as inputs are concerned, we are able to process dates in a natural
 way thanks to the `dateparser` Python library. Check it out:
@@ -133,6 +133,7 @@ conda activate lam
 ./sleep.py --help
 ```
 
+<a name="gcal-integration"></a>
 ## Google Calendar Integration
 
 ![Calendar Setup](./images/setup.png)
@@ -174,6 +175,15 @@ correctly with this script.
 2. Next to the OAuth client, click on the download icon to download the JSON file.
 3. The JSON file contains your client ID and client secret. Keep it secure and do not share it.
 
+In our case, we will create the following directory and copy.
+You can change it by editing the `SECURITY_DIR` configuration variable
+at the top of the `sleep.py` script.
+
+```bash
+export SECURITY_DIR="${HOME}/security/gcp/sleep.py"
+mkdir -p "${SECURITY_DIR}
+cp /path/to/client_secret.json "${SECURITY_DIR}/client_secret.json"
+```
 ### Step 5: Install Google Client Library
 
 You'll need the Google Client Library for Python to use OAuth 2.0 credentials
