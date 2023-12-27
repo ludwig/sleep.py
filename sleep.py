@@ -394,10 +394,6 @@ def print_interval(start, end, duration):
     print(msg)
 
 
-def prediction_requested(args):
-    return args.predict_next or args.next_start or args.next_end or args.next_duration
-
-
 def get_current_interval(args, verbose=False):
     """Get the current sleep interval."""
     current_interval = get_interval(args.start, args.end, args.duration)
@@ -434,6 +430,23 @@ def get_next_interval(args, current_interval, verbose=False):
     return next_interval
 
 
+def update_calendar_requested(args):
+    return any([
+        args.update_calendar,
+        args.update_prediction_only,
+    ])
+
+
+def prediction_requested(args):
+    return any([
+        args.predict_next,
+        args.next_start,
+        args.next_end,
+        args.next_duration,
+        args.update_prediction_only,
+    ])
+
+
 def create_parser():
     parser = argparse.ArgumentParser(
         description="Track sleep and predict next sleep event",
@@ -465,6 +478,9 @@ def create_parser():
     parser.add_argument(
         "--update-calendar", "-u", action='store_true',
         help='Update calendar with specified sleep events')
+    parser.add_argument(
+        "--update-prediction-only", "--up", "-U", action='store_true',
+        help='Update calendar with only the predicted sleep event')
     return parser
 
 
@@ -479,14 +495,19 @@ def main():
     # Determine the next sleep interval, if requested.
     next_interval = get_next_interval(args, current_interval, verbose=True)
 
-    if not args.update_calendar:
+    # We are done, if no calendar updates were requested.
+    if not update_calendar_requested(args):
         return
 
     # Update calendar with the given sleep events.
     service = get_service()
     calendar_id = get_sleep_calendar_id(service, verbose=True)
-    create_current_sleep_event(service, calendar_id, current_interval)
-    create_next_sleep_event(service, calendar_id, next_interval)
+
+    if not args.update_prediction_only:
+        create_current_sleep_event(service, calendar_id, current_interval)
+
+    if prediction_requested(args):
+        create_next_sleep_event(service, calendar_id, next_interval)
 
 if __name__ == "__main__":
     main()
