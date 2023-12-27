@@ -187,7 +187,7 @@ correctly with this script.
     - FIll in the required fields ("sleep.py" for the app name, support email, etc.)
     - Add your email address under "Test users". This allows your Google account to authenticate with the script.
     - Save and continue.
-4. Go back to the "Create OAuth client ID" screen:
+4. Go back to the "Credentials > Create Credentials > OAuth client ID" screen:
     - Select "Desktop app" as the application type.
     - Name your OAuth client ("sleep.py client", for example)
     - Click "Create".
