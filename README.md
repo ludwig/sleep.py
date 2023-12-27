@@ -29,7 +29,7 @@ in am/pm format. Check it out:
 The durations are parsed using the `parsedatetime` Python library.
 That one can support versatile inputs like "8 hours", "6 hours 30 mins",
 "5h 15m", "4.5h", etc. The supported formats aren't obvious from the
-documentation, but we've adapted the use of the calendar `parseDT` function
+documentation, but we've adapted the use of their calendar `parseDT` function
 within our own `parse_duration` method. Simply try out various formats
 to see if they work!
 * <https://pypi.org/project/parsedatetime/>
@@ -134,6 +134,9 @@ This offset represents how long you plan to stay awake for.
 
 Options related to Google Calendar:
 * `--update-calendar, -u`: Update calendar with specified sleep events.
+
+In case you only want to update the predicted sleep interval:
+* `--update-prediction-only, --up, -U`: Update calendar with only the predicted sleep event.
 
 ## Installation
 
