@@ -55,7 +55,7 @@ There are default values you can override, of course.
 
 This might be the case if you didn't sleep exactly 8 hours.
 
-You can specify intervals via the usual start, end, duration values.
+You can specify intervals via start, end, duration values.
 The script itself will check for consistency, and fill in reasonable
 defaults for the missing information. The end value defaults to 'now',
 and the duration value defaults to 8 hours.
@@ -69,6 +69,17 @@ you would use this to add an entry to your "Sleep" calendar:
 The `-u` flag can be omitted if you want to double check
 the sleep intervals that will be created. When you're ready to update
 the Google Calendar you can put it back.
+
+If you just woke up, and you know you slept 6.5 hours,
+you can specify that duration with the `-d` option.
+```bash
+./sleep.py -d 6.5
+```
+
+Or if you know you fell asleep yesterday at 9pm and slept for 7 hours:
+```bash
+./sleep.py -e '9pm yesterday' -d '7 hours'
+```
 
 ## Sleep Prediction
 
